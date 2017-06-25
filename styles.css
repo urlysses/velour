@@ -24,9 +24,8 @@ svg,
 }
 
 .instruct {
-  top: 10%;
-  max-width: 75%;
-  max-height: 75%;
+  max-width: 65%;
+  max-height: 65%;
   visibility: hidden;
   opacity: 0;
   -webkit-transition: all 1s ease;
