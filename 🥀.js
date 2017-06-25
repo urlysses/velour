@@ -1,6 +1,7 @@
 /* globals window, document */
 const TO_RAD = Math.PI * 180;
 const MAX_PETALS = 50;
+const svg = document.querySelector('svg');
 const canvas = document.querySelector('canvas');
 const context = canvas.getContext('2d');
 
@@ -118,7 +119,7 @@ function newPetal() {
 
 function soEmotional() {
   context.clearRect(0, 0, canvas.width, canvas.height);
-  petals.map((p) => {
+  petals = petals.map((p) => {
     context.save();
     context.translate(p.x, p.y);
     context.rotate(p.r * TO_RAD);
