@@ -2,8 +2,13 @@
 const TO_RAD = Math.PI * 180;
 const MAX_PETALS = 50;
 const svg = document.querySelector('svg');
+const hairTop = svg.querySelector('#hair_top');
+const arm = svg.querySelector('#arms');
 const canvas = document.querySelector('canvas');
 const context = canvas.getContext('2d');
+
+const mask = document.createElement('canvas');
+const maskContext = mask.getContext('2d');
 
 function bp(c1x, c1y, c2x, c2y, x, y) {
   return { c1x, c1y, c2x, c2y, x, y };
@@ -99,16 +104,18 @@ function newPetal() {
   const g = petalGuides[Math.floor(petalGuides.length * Math.random())];
   const img = renderPetal(g);
   const h = renderCanvas.height;
-  const s = Math.max(0.3, Math.random());
+  const s = Math.min(0.2, Math.max(0.05, Math.random()));
+  const hairRect = hairTop.getBoundingClientRect();
+  const sh = h * s;
 
   return {
     img,
     w: renderCanvas.width,
     h,
     sw: renderCanvas.width * s,
-    sh: h * s,
-    x: Math.random() * canvas.width,
-    y: -(h + (Math.random() * h)),
+    sh,
+    x: (hairRect.left * 1.1) + (Math.random() * (hairRect.width * 0.4)),
+    y: -(sh + (Math.random() * sh)) + hairRect.top + (hairRect.height * 0.3),
     r: Math.random() * 360,
     speed: {
       x: ((Math.random() > 0.5 ? 1 : -1) * Math.random()) / 2,
@@ -119,6 +126,7 @@ function newPetal() {
 
 function soEmotional() {
   context.clearRect(0, 0, canvas.width, canvas.height);
+
   petals = petals.map((p) => {
     context.save();
     context.translate(p.x, p.y);
@@ -132,19 +140,88 @@ function soEmotional() {
     }
     return Object.assign(p, { x: p.x + p.speed.x, y: newY, bye });
   }).filter(p => !p.bye);
+
   if (shook) {
     if (petals.length < MAX_PETALS) {
       petals.push(newPetal());
     }
     shook = false;
   }
+
+  context.globalCompositeOperation = 'destination-in';
+  context.drawImage(mask, 0, 0);
+  context.globalCompositeOperation = 'source-over';
+
   window.requestAnimationFrame(soEmotional);
 }
 
 function setCanvasSize() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
+  mask.width = window.innerWidth;
+  mask.height = window.innerHeight;
+
+  // Repaint mask.
+  // Sorry. I know.
+  const height = mask.height;
+  const hairRect = hairTop.getBoundingClientRect();
+  const armsRect = arm.getBoundingClientRect();
+  maskContext.shadowBlur = 3;
+  maskContext.shadowColor = 'black';
+  maskContext.beginPath();
+  maskContext.moveTo(
+    hairRect.left + (hairRect.width * 0.02),
+    hairRect.top + (hairRect.height * 0.3),
+  );
+  maskContext.lineTo(hairRect.left, 0);
+  maskContext.lineTo(0, 0);
+  maskContext.lineTo(0, height);
+  maskContext.lineTo(hairRect.right, height);
+  maskContext.lineTo(hairRect.right, hairRect.bottom);
+  maskContext.lineTo(hairRect.left + (hairRect.width * 0.79), hairRect.bottom);
+  maskContext.lineTo(hairRect.left + (hairRect.width * 0.75), armsRect.bottom);
+  maskContext.lineTo(hairRect.left + (hairRect.width * 0.67), armsRect.bottom);
+  maskContext.lineTo(
+    hairRect.left + (hairRect.width * 0.59),
+    armsRect.top + (armsRect.height * 0.89),
+  );
+  maskContext.lineTo(
+    hairRect.left + (hairRect.width * 0.57),
+    armsRect.top + (armsRect.height * 0.73),
+  );
+  maskContext.lineTo(
+    hairRect.left + (hairRect.width * 0.58),
+    armsRect.top + (armsRect.height * 0.7),
+  );
+  maskContext.lineTo(
+    hairRect.left + (hairRect.width * 0.46),
+    armsRect.top + (armsRect.height * 0.52),
+  );
+  maskContext.lineTo(
+    hairRect.left + (hairRect.width * 0.47),
+    armsRect.top + (armsRect.height * 0.5),
+  );
+  maskContext.lineTo(
+    hairRect.left + (hairRect.width * 0.35),
+    armsRect.top + (armsRect.height * 0.24),
+  );
+  maskContext.lineTo(
+    hairRect.left + (hairRect.width * 0.3),
+    armsRect.top + (armsRect.height * 0.26),
+  );
+  maskContext.lineTo(
+    hairRect.left + (hairRect.width * 0.23),
+    armsRect.top + (armsRect.height * 0.235),
+  );
+  maskContext.lineTo(
+    hairRect.left + (hairRect.width * 0.15),
+    armsRect.top + (armsRect.height * 0.25),
+  );
+  maskContext.closePath();
+  maskContext.fill();
 }
+
+// Window event listeners.
 window.addEventListener('resize', setCanvasSize);
 window.addEventListener('orientationchange', setCanvasSize);
 window.addEventListener('load', () => {
@@ -155,7 +232,7 @@ window.addEventListener('load', () => {
   soEmotional();
 });
 
-// Shook event listeners
+// Shook event listeners.
 const threshold = {
   cursor: 20,
   motion: 2,
