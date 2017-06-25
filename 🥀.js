@@ -4,6 +4,7 @@ const MAX_PETALS = 50;
 const svg = document.querySelector('svg');
 const hairTop = svg.querySelector('#hair_top');
 const arm = svg.querySelector('#arms');
+const sHead = svg.querySelector('#head');
 const canvas = document.querySelector('canvas');
 const context = canvas.getContext('2d');
 
@@ -75,9 +76,23 @@ const renderCanvas = document.createElement('canvas');
 const renderContext = renderCanvas.getContext('2d');
 renderCanvas.width = 200;
 renderCanvas.height = 200;
-renderContext.fillStyle = 'red';
 function renderPetal({ offsets, points }) {
-  renderContext.clearRect(0, 0, renderCanvas.width, renderCanvas.height);
+  const rw = renderCanvas.width;
+  const rh = renderCanvas.height;
+
+  renderContext.clearRect(0, 0, rw, rh);
+  let gradient = renderContext.createLinearGradient(0, 0, rw, rh);
+  gradient.addColorStop(0, 'rgb(230, 0, 0)');
+  gradient.addColorStop(1, 'red');
+  renderContext.fillStyle = gradient;
+  renderContext.fillRect(0, 0, rw, rh);
+
+  gradient = renderContext.createLinearGradient(0, 0, rw, rh);
+  gradient.addColorStop(0, 'rgba(200, 230, 230, 0)');
+  gradient.addColorStop(0.5, 'rgba(200, 230, 230, 0)');
+  gradient.addColorStop(1, 'rgba(200, 230, 230, 0.5)');
+  renderContext.fillStyle = gradient;
+  renderContext.fillRect(0, 0, rw, rh);
 
   const { x: ox, y: oy } = offsets;
   const last = points.slice(-1)[0];
@@ -86,7 +101,10 @@ function renderPetal({ offsets, points }) {
   points.forEach(({ c1x, c1y, c2x, c2y, x, y }) => {
     renderContext.bezierCurveTo(c1x + ox, c1y + oy, c2x + ox, c2y + oy, x + ox, y + oy);
   });
+  renderContext.globalCompositeOperation = 'destination-in';
+  renderContext.fillStyle = 'black';
   renderContext.fill();
+  renderContext.globalCompositeOperation = 'source-over';
   const img = document.createElement('img');
   if (renderCanvas.toBlob && window.URL && window.URL.createObjectURL) {
     renderCanvas.toBlob((blob) => {
@@ -97,24 +115,28 @@ function renderPetal({ offsets, points }) {
   } else {
     img.src = renderCanvas.toDataURL('image/png');
   }
+
   return img;
 }
 
 function newPetal() {
+  const headRect = sHead.getBoundingClientRect();
   const g = petalGuides[Math.floor(petalGuides.length * Math.random())];
   const img = renderPetal(g);
+  const w = renderCanvas.width;
   const h = renderCanvas.height;
-  const s = Math.min(0.2, Math.max(0.05, Math.random()));
+  const s = Math.random() * ((headRect.width / 2) / w);
   const hairRect = hairTop.getBoundingClientRect();
-  const sh = h * s;
+  const sw = Math.min(headRect.width * 0.22, Math.max(headRect.width * 0.18, w * s));
+  const sh = Math.min(headRect.height * 0.22, Math.max(headRect.height * 0.18, h * s));
 
   return {
     img,
-    w: renderCanvas.width,
+    w,
     h,
-    sw: renderCanvas.width * s,
+    sw,
     sh,
-    x: (hairRect.left * 1.1) + (Math.random() * (hairRect.width * 0.4)),
+    x: sw + hairRect.left + (Math.random() * (hairRect.width * 0.4)),
     y: -(sh + (Math.random() * sh)) + hairRect.top + (hairRect.height * 0.3),
     r: Math.random() * 360,
     speed: {
