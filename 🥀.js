@@ -1,12 +1,13 @@
 /* globals window, document */
 const TO_RAD = Math.PI * 180;
-const MAX_PETALS = 50;
+const MAX_PETALS = 100;
 const svg = document.querySelector('svg');
 const hairTop = svg.querySelector('#hair_top');
 const arm = svg.querySelector('#arms');
 const sHead = svg.querySelector('#head');
 const canvas = document.querySelector('canvas');
 const context = canvas.getContext('2d');
+
 
 const mask = document.createElement('canvas');
 const maskContext = mask.getContext('2d');
@@ -71,6 +72,7 @@ const petalGuides = [
 
 let petals = [];
 let shook = false;
+let instructing = true;
 
 const renderCanvas = document.createElement('canvas');
 const renderContext = renderCanvas.getContext('2d');
@@ -141,7 +143,7 @@ function newPetal() {
     r: Math.random() * 360,
     speed: {
       x: ((Math.random() > 0.5 ? 1 : -1) * Math.random()) / 2,
-      y: 2 + (Math.random() * (h / 40)),
+      y: 2 + (Math.random() * (sh / 10)),
     },
   };
 }
@@ -248,9 +250,15 @@ window.addEventListener('resize', setCanvasSize);
 window.addEventListener('orientationchange', setCanvasSize);
 window.addEventListener('load', () => {
   setCanvasSize();
-  for (let i = 0; i < 10; i += 1) {
-    petals.push(newPetal());
-  }
+  setTimeout(() => {
+    document.body.className = '';
+    setTimeout(() => {
+      for (let i = 0; i < 10; i += 1) {
+        petals.push(newPetal());
+      }
+      instructing = false;
+    }, 250);
+  }, 2000);
   soEmotional();
 });
 
@@ -270,6 +278,9 @@ const currentShook = {
   z: 0,
 };
 function checkShook(th) {
+  if (instructing) {
+    return;
+  }
   const diff = Math.abs(
     (currentShook.x - lastShook.x) +
     (currentShook.y - lastShook.y) +
