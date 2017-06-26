@@ -174,7 +174,6 @@
     maskContext.shadowColor = 'black';
     maskContext.beginPath();
     maskContext.moveTo(hairRect.left + hairRect.width * 0.02, hairRect.top + hairRect.height * 0.3);
-    maskContext.lineTo(hairRect.left, 0);
     maskContext.lineTo(0, 0);
     maskContext.lineTo(0, height);
     maskContext.lineTo(hairRect.right, height);
