@@ -170,8 +170,6 @@
     var height = mask.height;
     var hairRect = hairTop.getBoundingClientRect();
     var armsRect = arms.getBoundingClientRect();
-    maskContext.shadowBlur = 3;
-    maskContext.shadowColor = 'black';
     maskContext.beginPath();
     maskContext.moveTo(hairRect.left + hairRect.width * 0.02, hairRect.top + hairRect.height * 0.3);
     maskContext.lineTo(0, 0);
