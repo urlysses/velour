@@ -8,6 +8,7 @@
   const head = svg.querySelector('#head');
   const canvas = document.querySelector('canvas');
   const context = canvas.getContext('2d');
+  const instruct = document.querySelector('.instruct');
 
 
   const mask = document.createElement('canvas');
@@ -297,7 +298,7 @@
     currentShook.y = e.y || e.clientY || e.pageY;
 
     checkShook(threshold.cursor);
-  });
+  }, false);
   window.addEventListener('devicemotion', (e) => {
     currentShook.x = e.accelerationIncludingGravity.x;
     currentShook.y = e.accelerationIncludingGravity.y;
@@ -305,4 +306,13 @@
 
     checkShook(threshold.motion);
   }, false);
+
+  // Shook instructions.
+  if (window.DeviceMotionEvent) {
+    // Mobile
+    instruct.src = 'instructions.svg';
+  } else {
+    // Etc.
+    instruct.src = 'instructions-desktop.svg';
+  }
 })();

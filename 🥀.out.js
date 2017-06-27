@@ -10,6 +10,7 @@
   var head = svg.querySelector('#head');
   var canvas = document.querySelector('canvas');
   var context = canvas.getContext('2d');
+  var instruct = document.querySelector('.instruct');
 
   var mask = document.createElement('canvas');
   var maskContext = mask.getContext('2d');
@@ -242,7 +243,7 @@
     currentShook.y = e.y || e.clientY || e.pageY;
 
     checkShook(threshold.cursor);
-  });
+  }, false);
   window.addEventListener('devicemotion', function (e) {
     currentShook.x = e.accelerationIncludingGravity.x;
     currentShook.y = e.accelerationIncludingGravity.y;
@@ -250,4 +251,13 @@
 
     checkShook(threshold.motion);
   }, false);
+
+  // Shook instructions.
+  if (window.DeviceMotionEvent) {
+    // Mobile
+    instruct.src = 'instructions.svg';
+  } else {
+    // Etc.
+    instruct.src = 'instructions-desktop.svg';
+  }
 })();
