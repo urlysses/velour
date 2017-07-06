@@ -253,7 +253,7 @@
   }, false);
 
   // Shook instructions.
-  if (window.DeviceMotionEvent) {
+  if (window.DeviceMotionEvent && typeof window.orientation !== 'undefined') {
     // Mobile
     instruct.src = 'instructions.svg';
   } else {
